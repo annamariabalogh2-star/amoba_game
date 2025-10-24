@@ -1,0 +1,24 @@
+package hu.amoba.vo;
+
+/**
+ * Egy játékos lépése: (sor, oszlop).
+ * Immutábilis VO – könnyű tesztelni, könnyű magyarázni.
+ */
+public final class Move {
+    private final int row;
+    private final int col;
+
+    public Move(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    public int row() { return row; }
+    public int col() { return col; }
+
+    @Override
+    public String toString() {
+        return "Move(" + row + "," + col + ")";
+    }
+}
+
