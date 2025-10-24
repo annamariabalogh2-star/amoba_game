@@ -26,3 +26,12 @@ A projekt Maven alapú, így terminálból indítható:
 
 - mvn clean install
 - java -jar target/amoba_game-1.0-SNAPSHOT.jar
+
+💬 Megjegyzés
+
+Ez a projekt tanulási céllal készült,
+és sokat segített abban, hogy megértsem a Maven,
+a JUnit-tesztek és az objektum-orientált programozás kapcsolatát.
+
+Készítette: Balogh Annamária 
+(Levelező hallgató – Programozási technológiák, 2025)
