@@ -4,25 +4,26 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Kiegészítő teszt a Game segédmetódusaihoz.
- * Ezek nem indítanak játékot, csak egyszerű kiírásokat végeznek.
+ * A segédfüggvények (showHelp, printScores) tesztje.
+ * Privát metódusokat reflexióval hívunk meg biztonságosan.
  */
-class GameUtilityTest {
+public class GameUtilityTest {
 
     @Test
     void testShowHelpAndPrintScores() {
         Game game = new Game();
 
-        // A showHelp() csak szöveget ír ki, nem dobhat hibát
         assertDoesNotThrow(() -> {
-            game.getClass().getDeclaredMethod("showHelp").setAccessible(true);
-            game.getClass().getDeclaredMethod("showHelp").invoke(game);
-        }, "A showHelp() nem dobhat hibát.");
+            // Reflexióval meghívjuk a showHelp() privát metódust
+            var showHelp = Game.class.getDeclaredMethod("showHelp");
+            showHelp.setAccessible(true);
+            showHelp.invoke(game);
 
-        // A printScores() sem interaktív, biztonságosan hívható
-        assertDoesNotThrow(() -> {
-            game.getClass().getDeclaredMethod("printScores").setAccessible(true);
-            game.getClass().getDeclaredMethod("printScores").invoke(game);
-        }, "A printScores() sem dobhat hibát.");
+            // Reflexióval meghívjuk a printScores() privát metódust
+            var printScores = Game.class.getDeclaredMethod("printScores");
+            printScores.setAccessible(true);
+            printScores.invoke(game);
+        }, "A showHelp() és printScores() metódusok nem dobhatnak hibát");
     }
 }
+

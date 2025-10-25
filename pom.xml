@@ -28,7 +28,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- ✅ Mockito (tesztekhez, ha később szükség lenne rá) -->
+    <!-- Mockito (tesztekhez, ha később szükség lenne rá) -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -36,25 +36,25 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- ✅ Logback (konzol logoláshoz) -->
+    <!-- Logback (konzol logoláshoz) -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.5.9</version>
     </dependency>
 
-    <!-- ✅ SQLite adatbázis -->
+    <!-- SQLite adatbázis -->
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.45.2.0</version>
     </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-      <!-- ✅  JAR plugin: futtatható JAR létrehozása -->
+
+      <!-- JAR plugin: futtatható JAR létrehozása -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -62,39 +62,13 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>hu.amoba.vo.App</mainClass>
+              <mainClass>hu.amoba.App</mainClass>
             </manifest>
           </archive>
         </configuration>
       </plugin>
 
-      <!-- ✅  Assembly plugin: „fat JAR” (minden függőséggel) -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>hu.amoba.vo.App</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- ✅ Checkstyle plugin: formázási hibák ellenőrzése -->
+      <!-- Checkstyle plugin: formázási hibák ellenőrzése -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
@@ -122,7 +96,33 @@
         </configuration>
       </plugin>
 
-      <!-- ✅ JaCoCo Plugin: tesztlefedettség mérése -->
+      <!-- Maven Assembly Plugin: függőségeket tartalmazó JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>hu.amoba.App</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- JaCoCo Plugin: tesztlefedettség mérése -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>

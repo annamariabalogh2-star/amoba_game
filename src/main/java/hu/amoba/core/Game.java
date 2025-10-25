@@ -29,9 +29,13 @@ public class Game {
     /** A játék indítása és a fő vezérlőciklus. */
     public void start() {
 
-        // --- Tesztmódban ne induljon interaktív játék ---
         if (Boolean.getBoolean("test.env")) {
-            System.out.println("[Teszt mód] A Game.start() interaktív része kihagyva.");
+            System.out.println("[Teszt mód] A Game.start() interaktív része kihagyva, középső X lerakva teszteléshez.");
+            if (!board.hasAnyMark()) {
+                int r = board.getRows() / 2;
+                int c = board.getCols() / 2;
+                board.place(r, c, 'X');
+            }
             return;
         }
 
