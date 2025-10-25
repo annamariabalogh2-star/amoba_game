@@ -5,11 +5,11 @@ import java.util.List;
 
 /**
  * A játéktábla és a szabályok:
- * - 10x10 alapból (de paraméterezhető)
- * - Üres mező: '-'
- * - Csak olyan üres mezőre lehet lépni, ami LEGALÁBB diagonálisan
- *   szomszédos bármelyik már lerakott jellel (8-irányú szomszédság).
- * - 5 azonos jel egymás mellett (vízsz., függ., átlók): győzelem.
+ *
+ * - 10x10 méretű az alap, de paraméterezhető.
+ * - Az üres mező jelölése: '-'
+ * - Csak olyan üres mezőre lehet lépni, ami LEGALÁBB diagonálisan szomszédos bármelyik már lerakott jellel (8-irányú szomszédság).
+ * - 5 azonos jel egymás mellett (vízsz., függ., átlók) jelenti a győzelmet.
  */
 public class Board {
     private final int rows;
@@ -28,7 +28,7 @@ public class Board {
         }
     }
 
-    /** Kényelmi konstruktor: négyzetes tábla (alap: 10). */
+    /** Kényelmi konstruktor: négyzetes tábla (alapméret: 10 x 10). */
     public Board() {
         this(10, 10);
     }
@@ -36,14 +36,14 @@ public class Board {
     public int getRows() { return rows; }
     public int getCols() { return cols; }
 
-    /** Visszaadja a cellák 2D tömbjét (csak olvasd, ne módosítsd kívülről). */
+    /** Visszaadja a cellák 2D tömbjét. */
     public char[][] getCells() { return cells; }
 
-    /** Lerak egy jelet, ha a lépés legális. */
+    /** Lerak egy jelet, ha a lépés szabályos. */
     public boolean place(int r, int c, char mark) {
         if (!isInside(r, c)) return false;
         if (cells[r][c] != '-') return false;
-        // Ha a tábla teljesen üres (első lépés), bármely üres mező ÉS/vagy előírt közép lépést a Game intézi.
+        // Ha a tábla teljesen üres első lépéskor, bármely üres mező illetve az előírt közép lépést a Game intézi.
         if (!hasAnyMark()) {
             cells[r][c] = mark;
             return true;
@@ -55,7 +55,7 @@ public class Board {
         return true;
     }
 
-    /** Van-e már bármilyen jel a táblán? */
+    /** Ellenőrzés, hogy van-e már bármilyen jel a táblán? */
     public boolean hasAnyMark() {
         for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++)
@@ -77,7 +77,7 @@ public class Board {
         return false;
     }
 
-    /** A mező a táblán belül van-e. */
+    /** A mező a táblán belül helyezkedik-e el? */
     public boolean isInside(int r, int c) {
         return r >= 0 && r < rows && c >= 0 && c < cols;
     }
@@ -93,33 +93,45 @@ public class Board {
                 // vízszintes
                 if (c + need <= cols) {
                     boolean ok = true;
-                    for (int k = 0; k < need; k++) if (cells[r][c + k] != mark) { ok = false; break; }
-                    if (ok) return true;
+                    for (int k = 0; k < need; k++)
+                        if (cells[r][c + k] != mark) { ok = false; break; }
+                        if (ok)
+
+                    return true;
                 }
                 // függőleges
                 if (r + need <= rows) {
                     boolean ok = true;
-                    for (int k = 0; k < need; k++) if (cells[r + k][c] != mark) { ok = false; break; }
-                    if (ok) return true;
+                    for (int k = 0; k < need; k++)
+                        if (cells[r + k][c] != mark) { ok = false; break; }
+                        if (ok)
+
+                    return true;
                 }
                 // átló ↘
                 if (r + need <= rows && c + need <= cols) {
                     boolean ok = true;
-                    for (int k = 0; k < need; k++) if (cells[r + k][c + k] != mark) { ok = false; break; }
-                    if (ok) return true;
+                    for (int k = 0; k < need; k++)
+                        if (cells[r + k][c + k] != mark) { ok = false; break; }
+                        if (ok)
+
+                    return true;
                 }
                 // átló ↙
                 if (r + need <= rows && c - need + 1 >= 0) {
                     boolean ok = true;
-                    for (int k = 0; k < need; k++) if (cells[r + k][c - k] != mark) { ok = false; break; }
-                    if (ok) return true;
+                    for (int k = 0; k < need; k++)
+                        if (cells[r + k][c - k] != mark) { ok = false; break; }
+                        if (ok)
+
+                    return true;
                 }
             }
         }
         return false;
     }
 
-    /** Minden olyan üres mező listája, ahova LÉPHETÜNK (szomszédos szabály). */
+    /** Minden olyan üres mező listája, ahova léphetünk, a szomszédos lépés szabályt alkalmazva. */
     public List<int[]> legalMoves() {
         List<int[]> out = new ArrayList<>();
         for (int r = 0; r < rows; r++) {
@@ -150,12 +162,12 @@ public class Board {
             System.out.println();
         }
     }
-    // Ellenőrzi, hogy a megadott sor és oszlop index a tábla határain belül van-e
+    // Ellenőrzi, hogy a megadott sor és oszlop index a tábla határain belül van-e?
     public boolean isInBounds(int r, int c) {
         return r >= 0 && r < rows && c >= 0 && c < cols;
     }
 
-    // Visszaadja a megadott mező tartalmát (X, O vagy '.')
+    // Visszaadja a megadott mező tartalmát (X, O vagy '-')
     public char get(int r, int c) {
         if (!isInBounds(r, c)) {
             throw new IllegalArgumentException("A megadott koordináta a tábla határain kívül esik.");

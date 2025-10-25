@@ -62,7 +62,7 @@ public class HighScoreRepository {
         return results;
     }
 
-    /** High score lista kiíratása a konzolra. */
+    /** High score (pontszámok) lista kiíratása a konzolra. */
     public void printHighScores() {
         System.out.println("\n-- High Score --");
         for (var entry : getAll().entrySet()) {

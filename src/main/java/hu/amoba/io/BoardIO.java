@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Egyszerű fájl alapú be/ki a táblához.
+ * Egy egyszerű fájl alapú be/ki a táblához.
  * Ha a fájl nem létezik: üres tábla (Game oldja meg a default lépést).
  */
 public class BoardIO {
@@ -22,15 +22,20 @@ public class BoardIO {
         }
         try (BufferedReader br = Files.newBufferedReader(path)) {
             String header = br.readLine();
-            if (header == null) return new Board(defaultRows, defaultCols);
+            if (header == null)
+                return new Board(defaultRows, defaultCols);
+
             String[] parts = header.trim().split("\\s+");
             int rows = Integer.parseInt(parts[0]);
             int cols = Integer.parseInt(parts[1]);
+
             Board b = new Board(rows, cols);
             char[][] cells = b.getCells();
             for (int r = 0; r < rows; r++) {
                 String line = br.readLine();
-                if (line == null) break;
+                if (line == null)
+                    break;
+
                 for (int c = 0; c < Math.min(cols, line.length()); c++) {
                     char ch = line.charAt(c);
                     if (ch == 'X' || ch == 'O' || ch == '-') {
@@ -39,6 +44,7 @@ public class BoardIO {
                 }
             }
             return b;
+
         } catch (Exception e) {
             System.out.println("Hiba a beolvasásnál, üres tábla indul. " + e.getMessage());
             return new Board(defaultRows, defaultCols);
@@ -56,12 +62,13 @@ public class BoardIO {
                 }
                 bw.newLine();
             }
+
         } catch (IOException e) {
             System.out.println("Hiba a mentésnél: " + e.getMessage());
         }
     }
 
-    // --- XML mentés és betöltés ---
+    // --- XML mentés és betöltés folyamata ---
 
     public static void saveToXml(Board board, Path file) {
         try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file))) {
@@ -78,6 +85,7 @@ public class BoardIO {
 
             out.println("</board>");
             System.out.println("XML mentés kész: " + file.toAbsolutePath());
+
         } catch (IOException e) {
             System.out.println("Hiba az XML mentés közben: " + e.getMessage());
         }
