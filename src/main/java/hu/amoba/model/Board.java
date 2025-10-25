@@ -1,4 +1,4 @@
-package hu.amoba.core;
+package hu.amoba.model;
 
 import java.util.ArrayList;
 import java.util.List;

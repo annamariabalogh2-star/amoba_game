@@ -1,4 +1,4 @@
-package hu.amoba.core;
+package hu.amoba.model;
 
 import java.util.List;
 import java.util.Random;

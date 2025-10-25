@@ -1,11 +1,10 @@
-package hu.amoba.core.io;
+package hu.amoba.model.io;
 
-import hu.amoba.core.Board;
+import hu.amoba.model.Board;
 import hu.amoba.io.BoardIO;
 import org.junit.jupiter.api.Test;
 import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.function.Executable;
 
 /**
  * Teszt a BoardIO XML mentés és betöltés funkciójára.

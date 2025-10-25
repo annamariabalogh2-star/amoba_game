@@ -177,7 +177,7 @@
                 <rule>
                   <element>PACKAGE</element>
                   <includes>
-                    <include>hu.amoba.core</include>
+                    <include>hu.amoba.model</include>
                   </includes>
                   <limits>
                     <limit>

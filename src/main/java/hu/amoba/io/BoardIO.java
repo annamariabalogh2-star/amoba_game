@@ -1,6 +1,6 @@
 package hu.amoba.io;
 
-import hu.amoba.core.Board;
+import hu.amoba.model.Board;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;

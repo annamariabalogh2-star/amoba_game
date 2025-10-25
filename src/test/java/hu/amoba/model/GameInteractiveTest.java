@@ -1,4 +1,4 @@
-package hu.amoba.core;
+package hu.amoba.model;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

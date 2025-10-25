@@ -1,4 +1,4 @@
-package hu.amoba.core;
+package hu.amoba.model;
 
 import hu.amoba.db.HighScoreRepository;
 import hu.amoba.io.BoardIO;

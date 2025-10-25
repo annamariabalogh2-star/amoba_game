@@ -7,7 +7,7 @@ package hu.amoba;
  */
 public class App {
     public static void main(String[] args) {
-        new hu.amoba.core.Game().start();
+        new hu.amoba.model.Game().start();
     }
 }
 
