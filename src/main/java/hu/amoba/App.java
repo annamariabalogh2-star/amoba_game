@@ -1,9 +1,8 @@
 package hu.amoba;
 
 /**
- * Belépési pont. Csak elindítja a játékot.
- * A játékmenet (input, lépések, mentés) NEM itt történik,
- * hanem a Game.start() metódusban.
+ * Belépési pont,ami csak elindítja a játékot. A játékmenet (input, lépések, mentés)
+ * nem itt történik, hanem a Game.start() metódusban.
  */
 public class App {
     public static void main(String[] args) {

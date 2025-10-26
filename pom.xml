@@ -79,7 +79,6 @@
         </configuration>
       </plugin>
 
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -122,6 +121,15 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <mainClass>hu.amoba.App</mainClass>
+        </configuration>
+      </plugin>
+
       <!-- JaCoCo Plugin: tesztlefedettség mérése -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -131,7 +139,7 @@
         <configuration>
           <!-- Az I/O és adatbázis részeket kihagyjuk a mérésből -->
           <includes>
-            <include>hu/amoba/core/**</include>
+            <include>hu/amoba/model/**</include>
             <include>hu/amoba/io/**</include>
           </includes>
           <excludes>
@@ -156,7 +164,7 @@
             </goals>
             <configuration>
               <includes>
-                <include>hu/amoba/core/**</include>
+                <include>hu/amoba/model/**</include>
               </includes>
               <excludes>
                 <exclude>hu/amoba/io/**</exclude>
