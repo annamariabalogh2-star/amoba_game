@@ -68,12 +68,16 @@ public class BoardIO {
         }
     }
 
+
+
     // --- XML mentés és betöltés folyamata ---
-
-    public static void saveToXml(Board board, Path file) {
+    public static void saveToXml(Board board, Path file, String playerName) {
         try (PrintWriter out = new PrintWriter(Files.newBufferedWriter(file))) {
+            // Ha a játékosnév elérhető, írjuk az első sorba kommentként
+            if (playerName != null && !playerName.isEmpty()) {
+                out.println("<!-- Player: " + playerName + " -->");
+            }
             out.println("<board rows=\"" + board.getRows() + "\" cols=\"" + board.getCols() + "\">");
-
             for (int r = 0; r < board.getRows(); r++) {
                 out.print("  <row>");
                 for (int c = 0; c < board.getCols(); c++) {
@@ -89,6 +93,8 @@ public class BoardIO {
         } catch (IOException e) {
             System.out.println("Hiba az XML mentés közben: " + e.getMessage());
         }
+
+
     }
 
     public static Board loadFromXml(Path file) {

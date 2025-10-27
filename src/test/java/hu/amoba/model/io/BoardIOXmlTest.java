@@ -23,7 +23,7 @@ class BoardIOXmlTest {
         board.place(3, 3, 'X');
 
         // 2. XML mentés
-        assertDoesNotThrow(() -> BoardIO.saveToXml(board, xmlPath),
+        assertDoesNotThrow(() -> BoardIO.saveToXml(board, xmlPath, "tesztjátékos"),
                 "Az XML mentésnek hiba nélkül le kell futnia.");
 
         // 3. Betöltés
@@ -59,7 +59,7 @@ class BoardIOXmlTest {
         // Próbáljuk érvénytelen elérési útra menteni (hibát kell kezelnie)
         Path badPath = Path.of("/nem/letezo/mappa/board.xml");
 
-        assertDoesNotThrow(() -> BoardIO.saveToXml(new Board(3, 3), badPath),
+        assertDoesNotThrow(() -> BoardIO.saveToXml(new Board(3, 3), badPath, "tesztjátékos"),
                 "A mentésnek hibátlanul kell kezelnie az érvénytelen elérési utat.");
     }
 
