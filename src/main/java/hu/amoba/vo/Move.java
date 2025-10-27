@@ -2,8 +2,7 @@ package hu.amoba.vo;
 
 /**
  * Egy játékos lépése: (sor, oszlop).
- * Immutábilis VO – könnyű tesztelni, könnyű magyarázni.
- */
+  */
 public final class Move {
     private final int row;
     private final int col;

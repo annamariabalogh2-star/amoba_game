@@ -107,5 +107,79 @@ class GameCommandTest {
 
         System.setIn(originalIn);
     }
+
+    @Test
+    void testStartLoadsPreviousGame() {
+        String fakeInput = String.join(System.lineSeparator(),
+                "i",            // Betöltést választ
+                "TesztPlayer"   // Név megadása
+        ) + System.lineSeparator();
+
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(fakeInput.getBytes()));
+
+        Game game = new Game();
+        assertDoesNotThrow(game::start,
+                "A start() metódusnak nem szabad hibát dobnia betöltés esetén sem.");
+
+        System.setIn(originalIn);
+    }
+
+    @Test
+    void testEmptyNameDefaultsToGamer() {
+        String fakeInput = String.join(System.lineSeparator(),
+                "n",  // új játék
+                ""    // üres név beírása
+        ) + System.lineSeparator();
+
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(fakeInput.getBytes()));
+
+        Game game = new Game();
+        assertDoesNotThrow(game::start);
+        System.setIn(originalIn);
+    }
+
+    @Test
+    void testXmlSaveAndLoadCommands() {
+        String fakeInput = String.join(System.lineSeparator(),
+                "TesztJatekos",
+                "xmlment",
+                "xmlbetolt",
+                "kilep"
+        ) + System.lineSeparator();
+
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(fakeInput.getBytes()));
+
+        Game game = new Game();
+        assertDoesNotThrow(game::start,
+                "Az XML mentés és betöltés parancsoknak hibátlanul kell működniük.");
+
+        System.setIn(originalIn);
+    }
+
+    @Test
+    void testIsDrawReturnsTrueWhenFull() throws Exception {
+        // 1) 3x3-as tábla, ahol lehetetlen 5 egymás mellett
+        Board tiny = new Board(3, 3);
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                tiny.place(r, c, ((r + c) % 2 == 0) ? 'X' : 'O'); // csak hogy ne legyen üres
+            }
+        }
+
+        // 2) Game példány, majd a board mezőt lecseréljük a 3x3-as táblára
+        Game game = new Game();
+        var boardField = Game.class.getDeclaredField("board");
+        boardField.setAccessible(true);
+        boardField.set(game, tiny);
+
+        // 3) Így már nincs üres mező és nem is lehet 5 egy sorban → döntetlen
+        assertTrue(game.isDraw(),
+                "A játék döntetlennek számít, ha nincs üres mező és nincs győztes.");
+    }
+
+
 }
 
