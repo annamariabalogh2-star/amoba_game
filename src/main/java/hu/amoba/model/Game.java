@@ -5,20 +5,25 @@ import hu.amoba.io.BoardIO;
 import hu.amoba.vo.Player;
 import java.nio.file.Path;
 import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * A játék fő vezérlőosztálya.
  * Feladata: a játék indítása, parancsok kezelése, lépések vezérlése és mentés/betöltés kezelése.
  */
+
 public class Game {
     private Board board;
+    private static final Logger log = LoggerFactory.getLogger(Game.class);
+
     private final AI ai = new AI();
     private final HighScoreRepository repo = new HighScoreRepository();
-    private final Scanner sc = new Scanner(System.in);
+    private Scanner sc = new Scanner(System.in);
 
     private Player human;
     private final Player cpu = new Player("Gep", 'O');
-
     private final Path boardFile = Path.of("board.txt");
 
     /** Konstruktor: alapértelmezett 10x10-es tábla. */
@@ -28,6 +33,8 @@ public class Game {
 
     /** A játék indítása és a fő vezérlőciklus. */
     public void start() {
+        sc = new Scanner(System.in); // Ha valahol már Scanner példány létezett, frissítsük, hogy a System.in változás érvényesüljön
+        log.info("A játék elindult.");
 
         if (Boolean.getBoolean("test.env")) {
             System.out.println("[Teszt mód] A Game.start() interaktív része kihagyva, középső X lerakva teszteléshez.");
@@ -37,9 +44,10 @@ public class Game {
                 board.place(r, c, 'X');
             }
             return;
+
         }
 
-        // --- Kezdőképernyő megjelenítése ---
+        // --- Formázott kezdőképernyő megjelenítése ---
         showIntro();
 
         // --- Korábbi mentés betöltése, ha van ---
@@ -49,13 +57,16 @@ public class Game {
         if (answer.equals("i")) {
             board = BoardIO.loadOrEmpty(boardFile, 10, 10);
             System.out.println("Korábbi játék betöltve.\n");
+            log.info("Korábbi játékállás betöltve a fájlból.");
         } else {
             board = new Board(10, 10);
             System.out.println("Új játék kezdődik!\n");
+            log.info("Új játék kezdődik üres táblával.");
+
         }
 
         // --- Név bekérése ---
-        System.out.print("Add meg a neved: ");
+        System.out.print("Kérlek add meg a neved: ");
         String name = sc.nextLine().trim();
         if (name.isEmpty()) {
             name = "Gamer";
@@ -109,7 +120,7 @@ public class Game {
 
             // --- Mentés XML-be ---
             if (line.equalsIgnoreCase("xmlment")) {
-                BoardIO.saveToXml(board, Path.of("board.xml"));
+                BoardIO.saveToXml(board, boardFile, human.getName());
                 System.out.println("Tábla elmentve XML formátumban.");
                 continue;
             }
@@ -145,15 +156,17 @@ public class Game {
                 // Ember lépése
                 if (!board.place(r, c, human.getMark())) {
                     System.out.println("Érvénytelen lépés (foglaltság / nem szomszédos)!");
+                    log.warn("Érvénytelen lépés: sor = {}, oszlop = {}", r, c);
                     continue;
                 }
 
                 // Győzelem ellenőrzése
                 if (board.hasFiveInARow(human.getMark())) {
                     board.print();
-                    System.out.println("🎉 " + human.getName() + " (X) nyert!");
+                    System.out.println(" Gratulálok! " + human.getName() + " (X) nyertél!");
                     repo.incWin(human.getName());
                     printScores();
+                    log.info("{} játékos (X) nyert!", human.getName());
                     break;
                 }
 
@@ -171,9 +184,10 @@ public class Game {
                 // Gép győzelem
                 if (board.hasFiveInARow(cpu.getMark())) {
                     board.print();
-                    System.out.println("🤖 Gép (O) nyert!");
+                    System.out.println(" Gép (O) nyert!");
                     repo.incWin(cpu.getName());
                     printScores();
+                    log.info("A gép (O) nyert!");
                     break;
                 }
                 continue;
@@ -181,6 +195,12 @@ public class Game {
 
             // Ha semmi sem egyezett:
             System.out.println("Ismeretlen parancs. Írd be: help");
+        }
+
+        if (isDraw()) {
+            System.out.println("A játék döntetlennel ért véget!");
+            log.info("A játék döntetlennel zárult.");
+            return;
         }
     }
 
@@ -210,6 +230,7 @@ public class Game {
         ║                              ║
         ╚══════════════════════════════╝
         """ + RESET);
+        log.info("A játék bezárult. Köszönjük a játékot!");
     }
 
     /** A parancslista és szabályok kiírása. */
@@ -279,6 +300,28 @@ public class Game {
             board.place(move[0], move[1], 'O');
         }
     }
+
+    /**
+     * Eldönti, hogy a játék döntetlennel ért-e véget. Akkor döntetlen, ha nincs több üres mező és
+     * senki sem nyert.
+     */
+    public boolean isDraw() {
+        // Ha van győztes, akkor nem döntetlen
+        if (board.hasFiveInARow('X') || board.hasFiveInARow('O')) {
+            return false;
+        }
+
+        // Ellenőrizzük, hogy maradt-e üres mező
+        for (int r = 0; r < board.getRows(); r++) {
+            for (int c = 0; c < board.getCols(); c++) {
+                if (board.get(r, c) == '-') {
+                    return false; // még van üres hely
+                }
+            }
+        }
+        return true; // nincs üres mező és nincs győztes → döntetlen
+    }
+
 }
 
 

@@ -3,6 +3,9 @@ package hu.amoba.model.io;
 import hu.amoba.model.Board;
 import hu.amoba.io.BoardIO;
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,6 +64,29 @@ class BoardIOXmlTest {
 
         assertDoesNotThrow(() -> BoardIO.saveToXml(new Board(3, 3), badPath, "tesztjátékos"),
                 "A mentésnek hibátlanul kell kezelnie az érvénytelen elérési utat.");
+    }
+
+    @Test
+    void testSaveToXmlWritesPlayerName() {
+        Board board = new Board(3, 3);
+        Path file = Path.of("test_player.xml");
+
+        // játékosnév hozzáadása szimulálva
+        String playerName = "Ancsa";
+        BoardIO.saveToXml(board, file, playerName);
+
+        // fájl tartalmának ellenőrzése
+        try {
+            String content = Files.readString(file);
+            assertTrue(content.contains("# Player: " + playerName),
+                    "A fájl tartalmazza a játékos nevét a mentésben.");
+        } catch (IOException e) {
+            fail("Nem sikerült beolvasni a fájlt: " + e.getMessage());
+        }
+
+        // takarítás
+        try { Files.deleteIfExists(file); }
+           catch (IOException ignored) {}
     }
 
 
