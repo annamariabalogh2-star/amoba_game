@@ -185,5 +185,18 @@ public class BoardTest {
                 "A tábla kiíratása nem okozhat kivételt");
     }
 
+    @Test
+    void testHasFiveInARowFalseCase() {
+        // Teszt: ne jelezzen győzelmet, ha nincs 5 egymás melletti azonos jel
 
+        Board board = new Board(5, 5);
+        board.place(0, 0, 'X');
+        board.place(0, 1, 'X');
+        board.place(0, 2, 'O'); // középen más jel
+        board.place(0, 3, 'X');
+        board.place(0, 4, 'X');
+
+        assertFalse(board.hasFiveInARow('X'),
+                "Nem szabad győzelmet érzékelnie, ha nincs 5 egymás mellett.");
+    }
 }
