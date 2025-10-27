@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Ez egy nagyon egyszerű AI:
- *
- * - bekéri a Board-tól a legális lépéseket
- * - véletlenszerűen kiválaszt egyet a szabad lépések közül
+ * Ez egy nagyon egyszerű AI, amely bekéri a Board-tól a legális lépéseket és véletlenszerűen kiválaszt
+ * egyet a szabad lépések közül
  */
 public class AI {
     private final Random rnd = new Random();

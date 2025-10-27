@@ -174,4 +174,20 @@ public class Board {
         }
         return cells[r][c];
     }
+
+    /**
+     * Ellenőrzi, hogy van-e még szabad hely a táblán, ha nincs több üres mező ('-'), akkor döntetlen az állás.
+     */
+    public boolean allSpotsTaken() {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (cells[r][c] == '-') {
+                    return false; // még van üres mező
+                }
+            }
+        }
+        return true; // nincs több üres mező → döntetlen
+    }
+
+
 }
