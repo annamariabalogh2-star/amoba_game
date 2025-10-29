@@ -1,89 +1,39 @@
-# ==============================
-#   JAVA + MAVEN + INTELLIJ
-# ==============================
-
-##############################
-# Maven build és cache fájlok
-##############################
 target/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
+!/src/main//target/
+!/src/test//target/
 
-##############################
-# IntelliJ IDEA fájlok
-##############################
+### IntelliJ IDEA ###
 .idea/
-*.iml
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
 *.iws
+*.iml
 *.ipr
-out/
 
-##############################
-# Eclipse IDE fájlok
-##############################
+### Eclipse ###
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings/
+.settings
 .springBeans
 .sts4-cache
 
-##############################
-# NetBeans IDE fájlok
-##############################
-nbproject/private/
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+!/src/main//build/
+!/src/test//build/
 
-##############################
-# VS Code fájlok
-##############################
+### VS Code ###
 .vscode/
 
-##############################
-# OS-specifikus fájlok
-##############################
-# macOS
+### Mac OS ###
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Linux
-*~
-.nfs*
-
-##############################
-# Logok, mentések, dumpok
-##############################
-*.log
-*.tmp
-*.bak
-*.swp
-*.swo
-*.orig
-
-##############################
-# Kiegészítő fájlok kizárása
-##############################
-# (lokális adatbázis, mentések, build exportok)
-amoba.db
-board.txt
-test_board.xml
-*.csv
-*.json
-*.db
