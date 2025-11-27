@@ -1,5 +1,6 @@
 package hu.amoba.model;
 
+import hu.amoba.ui.Game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

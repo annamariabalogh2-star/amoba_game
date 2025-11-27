@@ -4,23 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A játéktábla és a szabályok:
- *
- * - 10x10 méretű az alap, de paraméterezhető.
- * - Az üres mező jelölése: '-'
- * - Csak olyan üres mezőre lehet lépni, ami LEGALÁBB diagonálisan szomszédos bármelyik már lerakott jellel (8-irányú szomszédság).
- * - 5 azonos jel egymás mellett (vízsz., függ., átlók) jelenti a győzelmet.
+ * A Board (tábla) osztály az amőba játék tábláját kezeli.
+ * A tábla egy kétdimenziós karaktertömb, ahol:
+ *  'X'  – emberi játékos
+ *  'O'  – gép
+ *  '-'  – üres mező
  */
 public class Board {
+
+    /** Sorok száma. */
     private final int rows;
+
+    /** Oszlopok száma. */
     private final int cols;
+
+    /** A tábla cellái. */
     private final char[][] cells;
 
+    /** Megadott méretű üres tábla létrehozása. */
     public Board(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this.cells = new char[rows][cols];
-        // Kezdetben minden üres
+
+        // Kezdetben minden mező üres ('-')
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 cells[r][c] = '-';
@@ -28,48 +35,67 @@ public class Board {
         }
     }
 
-    /** Kényelmi konstruktor: négyzetes tábla (alapméret: 10 x 10). */
+    /** Kényelmi konstruktor: alapból 10x10-es tábla. */
     public Board() {
         this(10, 10);
     }
 
-    public int getRows() { return rows; }
-    public int getCols() { return cols; }
+    public int getRows() {
+        return rows;
+    }
 
-    /** Visszaadja a cellák 2D tömbjét. */
-    public char[][] getCells() { return cells; }
+    public int getCols() {
+        return cols;
+    }
 
-    /** Lerak egy jelet, ha a lépés szabályos. */
+    /** A teljes tábla tömbjét adja vissza (pl. mentéshez). */
+    public char[][] getCells() {
+        return cells;
+    }
+
+    /**
+     * Lerak egy jelet a tábla egy mezőjére, ha a lépés szabályos.
+     *
+     * Szabályok:
+     *  - nem léphetünk a tábla határain kívül;
+     *  - nem írhatunk felül már foglalt mezőt;
+     *  - ha már volt lépés, akkor csak szomszédos mezőre léphetünk.
+     *
+     * @return true, ha sikerült a lépés, különben false
+     */
     public boolean place(int r, int c, char mark) {
-        if (!isInside(r, c)) return false;
-        if (cells[r][c] != '-') return false;
-        // Ha a tábla teljesen üres első lépéskor, bármely üres mező illetve az előírt közép lépést a Game intézi.
+        // Tábla határain belül vagyunk?
+        if (!isInBounds(r, c)) {
+            return false;
+        }
+
+        // Üres a mező?
+        if (cells[r][c] != '-') {
+            return false;
+        }
+
+        // Ha még nincs jel a táblán, az első lépés bárhová mehet
         if (!hasAnyMark()) {
             cells[r][c] = mark;
             return true;
         }
-        // Máskülönben: csak akkor tehetünk ide, ha szomszédos legalább 1 meglévő jellel
-        if (!isAdjacentToAny(r, c)) return false;
+
+        // Későbbi lépések: csak szomszédos mezőre
+        if (!isAdjacentMark(r, c)) {
+            return false;
+        }
 
         cells[r][c] = mark;
         return true;
     }
 
-    /** Ellenőrzés, hogy van-e már bármilyen jel a táblán? */
+    /**
+     * Van-e már legalább egy lerakott jel a táblán?
+     */
     public boolean hasAnyMark() {
-        for (int r = 0; r < rows; r++)
-            for (int c = 0; c < cols; c++)
-                if (cells[r][c] != '-') return true;
-        return false;
-    }
-
-    /** A (r,c) mező 8-irányban szomszédos-e bármely lerakott X/O mezővel? */
-    public boolean isAdjacentToAny(int r, int c) {
-        for (int dr = -1; dr <= 1; dr++) {
-            for (int dc = -1; dc <= 1; dc++) {
-                if (dr == 0 && dc == 0) continue;
-                int rr = r + dr, cc = c + dc;
-                if (isInside(rr, cc) && cells[rr][cc] != '-') {
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (cells[r][c] != '-') {
                     return true;
                 }
             }
@@ -77,83 +103,109 @@ public class Board {
         return false;
     }
 
-    /** A mező a táblán belül helyezkedik-e el? */
-    public boolean isInside(int r, int c) {
+    /**
+     * Szomszédos-e (8 irányban) a mező bármely már lerakott jellel?
+     * Ez biztosítja, hogy a játék „egy kupacban” maradjon.
+     */
+    public boolean isAdjacentMark(int r, int c) {
+        for (int dr = -1; dr <= 1; dr++) {
+            for (int dc = -1; dc <= 1; dc++) {
+                if (dr == 0 && dc == 0) {
+                    continue;
+                }
+                int rr = r + dr;
+                int cc = c + dc;
+                if (isInBounds(rr, cc) && cells[rr][cc] != '-') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Ellenőrzi, hogy a megadott sor/oszlop index a tábla határain belül van-e.
+     */
+    public boolean isInBounds(int r, int c) {
         return r >= 0 && r < rows && c >= 0 && c < cols;
     }
 
-    /** Győzelem-ellenőrzés: van-e 5 egymás mellett ugyanabból a jelből. */
+    /**
+     * Megnézi, hogy van-e 5 egymás melletti azonos jel a táblán.
+     * Négy irányban vizsgál:
+     *  - vízszintes (jobbra)
+     *  - függőleges (lefelé)
+     *  - átló (le-jobbra)
+     *  - átló (le-balra)
+     */
     public boolean hasFiveInARow(char mark) {
-        int need = 5;
+        // Négy irány: jobbra, le, le-jobbra, le-balra
+        int[][] iranyok = {
+                {0, 1},   // vízszintes →
+                {1, 0},   // függőleges ↓
+                {1, 1},   // átló ↘
+                {1, -1}   // átló ↙
+        };
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                if (cells[r][c] != mark) continue;
-
-                // vízszintes
-                if (c + need <= cols) {
-                    boolean ok = true;
-                    for (int k = 0; k < need; k++)
-                        if (cells[r][c + k] != mark) { ok = false; break; }
-                        if (ok)
-
-                    return true;
+                if (cells[r][c] != mark) {
+                    continue;
                 }
-                // függőleges
-                if (r + need <= rows) {
-                    boolean ok = true;
-                    for (int k = 0; k < need; k++)
-                        if (cells[r + k][c] != mark) { ok = false; break; }
-                        if (ok)
 
-                    return true;
-                }
-                // átló ↘
-                if (r + need <= rows && c + need <= cols) {
+                // Minden irányt külön megnézünk
+                for (int[] dir : iranyok) {
+                    int dr = dir[0];
+                    int dc = dir[1];
                     boolean ok = true;
-                    for (int k = 0; k < need; k++)
-                        if (cells[r + k][c + k] != mark) { ok = false; break; }
-                        if (ok)
 
-                    return true;
-                }
-                // átló ↙
-                if (r + need <= rows && c - need + 1 >= 0) {
-                    boolean ok = true;
-                    for (int k = 0; k < need; k++)
-                        if (cells[r + k][c - k] != mark) { ok = false; break; }
-                        if (ok)
+                    // Az aktuális mező benne van, ehhez még 4-et vizsgálunk
+                    for (int k = 1; k < 5; k++) {
+                        int rr = r + dr * k;
+                        int cc = c + dc * k;
+                        if (!isInBounds(rr, cc) || cells[rr][cc] != mark) {
+                            ok = false;
+                            break;
+                        }
+                    }
 
-                    return true;
+                    if (ok) {
+                        return true; // találtunk 5 egymás mellettit
+                    }
                 }
             }
         }
         return false;
     }
 
-    /** Minden olyan üres mező listája, ahova léphetünk, a szomszédos lépés szabályt alkalmazva. */
+    /** Az összes olyan lépést visszaadja, ahová szabályosan lehet lépni. Ha még üres a tábla, bárhová lehet; különben csak szomszédos üres mezőre. */
     public List<int[]> legalMoves() {
         List<int[]> out = new ArrayList<>();
+        boolean vanJel = hasAnyMark();
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                if (cells[r][c] == '-' && ( !hasAnyMark() || isAdjacentToAny(r, c) )) {
-                    out.add(new int[]{r, c});
+                if (cells[r][c] == '-') {
+                    if (!vanJel || isAdjacentMark(r, c)) {
+                        out.add(new int[]{r, c});
+                    }
                 }
             }
         }
         return out;
     }
 
-    /** Konzolra rajzolás (sorszámok 1..N, oszlop betűk a..). */
+    /** A tábla kirajzolása a konzolra. Oszlopok: betűk (a, b, c, ...), sorok: számok (1, 2, 3, ...). */
     public void print() {
-        // oszlopfejlécek
+        // Oszlopfejlécek
         System.out.print("    ");
         for (int c = 0; c < cols; c++) {
-            char letter = (char)('a' + c); // a,b,c...
+            char letter = (char) ('a' + c);
             System.out.print(letter + " ");
         }
         System.out.println();
-        // sorok
+
+        // Sorok
         for (int r = 0; r < rows; r++) {
             System.out.printf("%2d  ", (r + 1));
             for (int c = 0; c < cols; c++) {
@@ -162,12 +214,8 @@ public class Board {
             System.out.println();
         }
     }
-    // Ellenőrzi, hogy a megadott sor és oszlop index a tábla határain belül van-e?
-    public boolean isInBounds(int r, int c) {
-        return r >= 0 && r < rows && c >= 0 && c < cols;
-    }
 
-    // Visszaadja a megadott mező tartalmát (X, O vagy '-')
+    /** Visszaadja egy mező tartalmát ('X', 'O' vagy '-'). Ha a pozíció a tábla határain kívül esik, kivételt dob. */
     public char get(int r, int c) {
         if (!isInBounds(r, c)) {
             throw new IllegalArgumentException("A megadott koordináta a tábla határain kívül esik.");
@@ -175,19 +223,15 @@ public class Board {
         return cells[r][c];
     }
 
-    /**
-     * Ellenőrzi, hogy van-e még szabad hely a táblán, ha nincs több üres mező ('-'), akkor döntetlen az állás.
-     */
+    /** Igazat ad vissza, ha a tábla teljesen tele van (nincs több üres mező). */
     public boolean allSpotsTaken() {
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 if (cells[r][c] == '-') {
-                    return false; // még van üres mező
+                    return false;
                 }
             }
         }
-        return true; // nincs több üres mező → döntetlen
+        return true;
     }
-
-
 }

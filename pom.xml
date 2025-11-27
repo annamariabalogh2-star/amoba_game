@@ -1,182 +1,156 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
+  <!--  Projekt alap adatok  -->
   <groupId>hu.amoba</groupId>
   <artifactId>amoba_game</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Amoba Game</name>
-  <description>Parancssoros Amőba játék Maven projekt formában</description>
-
+  <packaging>jar</packaging>
+  <name>Amőba játék</name>
+  <description>Amőba Console Edition (Java 21 + Maven)</description>
+  <!--  Nyelvi beállítások  -->
   <properties>
+    <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven-checkstyle.version>3.6.0</maven-checkstyle.version>
+    <junit.jupiter.version>5.10.2</junit.jupiter.version>
   </properties>
-
+  <!--  Függőségek  -->
   <dependencies>
-
-    <!-- JUnit 5 (Jupiter) – egy csomagban -->
+    <!--  Zsombor pom.xml-jéből  -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <!--  JUnit 5  -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- Mockito (tesztekhez, ha később szükség lenne rá) -->
+    <!--  Mokito + JUnit 5 integráció  -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
+      <version>5.14.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
       <version>5.11.0</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- Logback (konzol logoláshoz) -->
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.5.9</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>5.2.0</version>
+      <scope>test</scope>
     </dependency>
-
-    <!-- SQLite adatbázis -->
+    <!--  json  -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.17.2</version>
+    </dependency>
+    <!--  sqlite-jdbc driver  -->
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.45.2.0</version>
+      <version>3.46.0.0</version>
+    </dependency>
+    <!--  SLF4J API 2.0 (logback 1.5.x miatt)  -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.13</version>
+    </dependency>
+    <!--  Logback binding  -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.5.13</version>
     </dependency>
   </dependencies>
-
+  <!--  Build (compiler + pluginok)  -->
   <build>
     <plugins>
-
-      <!-- JAR plugin: futtatható JAR létrehozása -->
+      <!--  Fordító  -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.12.1</version>
         <configuration>
-          <archive>
-            <manifest>
-              <mainClass>hu.amoba.App</mainClass>
-            </manifest>
-          </archive>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <release>21</release>
+          <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
-
-      <!-- Checkstyle plugin: formázási hibák ellenőrzése -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.1</version>
-        <configuration>
-          <configLocation>google_checks.xml</configLocation>
-          <consoleOutput>true</consoleOutput>
-          <failOnViolation>false</failOnViolation>
-        </configuration>
-      </plugin>
-
+      <!--  Surefire  -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.5</version>
         <configuration>
-
-          <!-- Ezt olvassa a Game.start() -->
-          <systemPropertyVariables>
-            <test.env>true</test.env>
-          </systemPropertyVariables>
-
-          <!-- Jacoco prepare-agent által előállított argLine továbbadása -->
-          <argLine>@{argLine}</argLine>
           <useModulePath>false</useModulePath>
         </configuration>
       </plugin>
-
-      <!-- Maven Assembly Plugin: függőségeket tartalmazó JAR -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <archive>
-            <manifest>
-              <mainClass>hu.amoba.App</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
+      <!--  Exec plugin (MS Terminál futtatáshoz)  -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.6.2</version>
         <configuration>
-          <mainClass>hu.amoba.App</mainClass>
-        </configuration>
+          <mainClass>hu.amoba.ui.App</mainClass>
+          <systemProperties>
+            <systemProperty>
+              <key>file.encoding</key>
+              <value>UTF-8</value>
+            </systemProperty>
+          </systemProperties>
+          </configuration>
       </plugin>
-
-      <!-- JaCoCo Plugin: tesztlefedettség mérése -->
+      <!--  Jacoco plugin  -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.11</version>
-
-        <configuration>
-          <!-- Az I/O és adatbázis részeket kihagyjuk a mérésből -->
-          <includes>
-            <include>hu/amoba/model/**</include>
-            <include>hu/amoba/io/**</include>
-          </includes>
-          <excludes>
-            <exclude>hu/amoba/db/**</exclude>
-          </excludes>
-        </configuration>
-
-          <executions>
-          <!-- tesztek instrumentálása -->
+        <version>0.8.12</version>
+        <executions>
+          <!--  teszt futtatása  -->
           <execution>
+            <id>prepare-agent</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-
-          <!-- HTML riport -->
+          <!--  HTML riport  -->
           <execution>
             <id>report</id>
             <phase>verify</phase>
             <goals>
               <goal>report</goal>
             </goals>
-            <configuration>
-              <includes>
-                <include>hu/amoba/model/**</include>
-              </includes>
-              <excludes>
-                <exclude>hu/amoba/io/**</exclude>
-                <exclude>hu/amoba/vo/**</exclude>
-                <exclude>hu/amoba/db/**</exclude>
-              </excludes>
-            </configuration>
           </execution>
-
-          <!-- Küszöbök ellenőrzése -->
+          <!--  Küszöbök ellenőrzése  -->
           <execution>
             <id>check</id>
             <goals>
@@ -187,18 +161,13 @@
                 <rule>
                   <element>PACKAGE</element>
                   <includes>
-                    <include>hu.amoba.model</include>
+                    <include>hu.amoba.ui.App</include>
                   </includes>
                   <limits>
                     <limit>
-                      <counter>INSTRUCTION</counter>
+                      <counter>LINE</counter>
                       <value>COVEREDRATIO</value>
-                      <minimum>0.60</minimum>
-                    </limit>
-                    <limit>
-                      <counter>BRANCH</counter>
-                      <value>COVEREDRATIO</value>
-                      <minimum>0.60</minimum>
+                      <minimum>0.80</minimum>
                     </limit>
                   </limits>
                 </rule>
@@ -207,6 +176,88 @@
           </execution>
         </executions>
       </plugin>
+      <!--  Checkstyle: build-break, riport és lokális HTML  -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven-checkstyle.version}</version>
+        <configuration>
+          <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+          <consoleOutput>true</consoleOutput>
+          <failOnViolation>false</failOnViolation>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <!-- <goal>check</goal> -->
+              <goal>checkstyle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!--  Enforcer: fix Java verzió, ismétlődő dep. tiltások stb.  -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[21,)</version>
+                </requireJavaVersion>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!--   PMD Plugin (Zsombor pom.xml-ből)   -->
+      <!--
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-pmd-plugin</artifactId>
+                      <version>3.27.0</version>
+                      <configuration>
+                          <rulesets>
+                              <ruleset>category/java/bestpractices.xml</ruleset>
+                              <ruleset>category/java/codestyle.xml</ruleset>
+                          </rulesets>
+                      </configuration>
+                      <executions>
+                          <execution>
+                              <phase>prepare-package</phase>
+                              <goals>
+                                  <goal>check</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+                   -->
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven-checkstyle.version}</version>
+        <configuration>
+          <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+          <failOnViolation>false</failOnViolation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.9.0</version>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

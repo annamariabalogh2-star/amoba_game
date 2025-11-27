@@ -1,5 +1,6 @@
 package hu.amoba.model;
 
+import hu.amoba.ui.Game;
 import org.junit.jupiter.api.*;
 import java.nio.file.*;
 import static org.junit.jupiter.api.Assertions.*;

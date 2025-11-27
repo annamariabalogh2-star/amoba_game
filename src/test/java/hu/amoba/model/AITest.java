@@ -1,5 +1,6 @@
 package hu.amoba.model;
 
+import hu.amoba.service.AI;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

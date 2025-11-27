@@ -92,11 +92,11 @@ public class BoardTest {
     void testIsAdjacentToAny() {
         board.place(5, 5, 'X');
         // A (6,6) mező diagonálisan szomszédos
-        assertTrue(board.isAdjacentToAny(6, 6),
+        assertTrue(board.isAdjacentMark(6, 6),
                 "A (6,6) mező diagonálisan szomszédos, tehát igaz kell legyen");
 
         // A (0,0) messze van → nem szomszédos
-        assertFalse(board.isAdjacentToAny(0, 0),
+        assertFalse(board.isAdjacentMark(0, 0),
                 "A (0,0) messze van, tehát hamis kell legyen");
     }
 
