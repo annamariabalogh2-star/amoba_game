@@ -218,7 +218,7 @@ public class Board {
     /** Visszaadja egy mező tartalmát ('X', 'O' vagy '-'). Ha a pozíció a tábla határain kívül esik, kivételt dob. */
     public char get(int r, int c) {
         if (!isInBounds(r, c)) {
-            throw new IllegalArgumentException("A megadott koordináta a tábla határain kívül esik.");
+            throw new IllegalArgumentException("A megadott koordinata a tábla hatarain kívul esik.");
         }
         return cells[r][c];
     }

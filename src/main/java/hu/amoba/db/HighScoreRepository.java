@@ -44,6 +44,7 @@ public class HighScoreRepository {
      *  - player_name (szöveg, elsődleges kulcs)
      *  - wins (egész szám, alapértelmezetten 0)
      * Ez a metódus gondoskodik róla, hogy az adatbázis mindig használatra kész legyen. */
+
     private void createTableIfNeeded() {
         String sql = """
             CREATE TABLE IF NOT EXISTS highscore(
@@ -55,27 +56,27 @@ public class HighScoreRepository {
              Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
-            System.err.println("Hiba az adatbázis inicializálásakor: " + e.getMessage());
+            System.err.println("Hiba az adatbazis inicializalasakor: " + e.getMessage());
         }
     }
 
-    /** Növeli a megadott játékos győzelmeinek számát. Ha a játékos még nem szerepel az adatbázisban, automatikusan
-     * felkerül 1 győzelemmel. Ha már létezik, a nyert meccsek száma eggyel nő.
-     * Példa:
-     *  - incWin("Anna") → ha Anna még nincs a táblában, bekerül 1 győzelemmel.
-     *  - újabb hívás esetén Anna már 2 győzelemmel fog szerepelni. */
-    public void incWin(String playerName) {
+    /** Növeli egy játékos pontjait a megadott értékkel. A tábla "wins" oszlopa most valójában a pontokat tárolja:
+     * győzelem = 3 pont, döntetlen = 1 pont, vereség = 0 pont. */
+
+    public void addPoints(String playerName, int points) {
         String sql = """
             INSERT INTO highscore(player_name, wins)
-            VALUES(?, 1)
-            ON CONFLICT(player_name) DO UPDATE SET wins = wins + 1;
+            VALUES(?, ?)
+            ON CONFLICT(player_name) DO UPDATE SET wins = wins + ?;
             """;
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, playerName);
+            ps.setInt(2, points);
+            ps.setInt(3, points);
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Hiba a győzelem mentésekor: " + e.getMessage());
+            System.err.println("Hiba a pontok mentesekor: " + e.getMessage());
         }
     }
 
@@ -93,8 +94,27 @@ public class HighScoreRepository {
                 results.put(rs.getString("player_name"), rs.getInt("wins"));
             }
         } catch (SQLException e) {
-            System.err.println("Hiba az eredmények lekérdezésekor: " + e.getMessage());
+            System.err.println("Hiba az eredmenyek lekerdezesekor: " + e.getMessage());
         }
         return results;
+    }
+
+    public void printHighScores() {
+        Map<String, Integer> all = getAll();
+
+        System.out.println();
+        System.out.println("-- Ponttabla (3 pont gyozelem, 1 pont dontetlen) --");
+
+        if (all.isEmpty()) {
+            System.out.println("Meg nincs elmentett eredmeny.");
+            return;
+        }
+
+        System.out.printf("%-20s %s%n", "Jatekos", "Pont");
+        System.out.println("------------------------------");
+
+        for (var entry : all.entrySet()) {
+            System.out.printf("%-20s %d%n", entry.getKey(), entry.getValue());
+        }
     }
 }
