@@ -1,18 +1,16 @@
-package hu.amoba.model;
+package hu.amoba.ui;
 
-import hu.amoba.ui.Game;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Egységtesztek a Game osztályhoz.
+/** Egységtesztek a Game osztályhoz.
  * - Ellenőrzi, hogy a játék rendben inicializálódik.
  * - Az X kezdőlépés a középső mezőre kerül.
  * - A gép (O) legalább egy O-t lerak a táblára.
- * - Érvénytelen lépést nem engedünk (negatív példa).
- */
+ * - Érvénytelen lépést nem engedünk (negatív példa). */
+
 public class GameTest {
 
     private Game game;
@@ -110,18 +108,6 @@ public class GameTest {
         if (name.isEmpty()) name = "Gamer";
         assertEquals("Gamer", name,
                 "Üres név esetén a program automatikusan 'Gamer'-t állít be.");
-    }
-
-    /** A kezdőképernyő (intro) hibátlanul lefut. */
-    @Test
-    void testShowIntroDoesNotThrow() {
-        Game game = new Game();
-
-        assertDoesNotThrow(() -> {
-            var method = Game.class.getDeclaredMethod("showIntro");
-            method.setAccessible(true);
-            method.invoke(game);
-        }, "A showIntro() metódusnak hibátlanul kell lefutnia.");
     }
 
     /** Segédfüggvény a tábla mély másolásához. */

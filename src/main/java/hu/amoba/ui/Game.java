@@ -5,12 +5,12 @@ import java.util.Scanner;
 
 import hu.amoba.service.AI;
 import hu.amoba.model.Board;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import hu.amoba.io.BoardIO;
 import hu.amoba.vo.Player;
 import hu.amoba.service.PonttablaKezelo;
 import hu.amoba.service.DontetlenEllenorzo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Game {
 
@@ -298,6 +298,22 @@ public class Game {
         if (move != null) {
             board.place(move[0], move[1], 'O');
         }
+    }
+
+    // Egyszerű "továbbhívó" metódusok a tesztek kedvéért.
+    /** Kezdő képernyő megjelenítése Game-ből. */
+    public void showIntro() {
+        nezet.showIntro();
+    }
+
+    /** Súgó megjelenítése Game-ből. */
+    public void showHelp() {
+        nezet.showHelp();
+    }
+
+    /** Ponttábla kiíratása Game-ből. */
+    public void printScores() {
+        ponttablaKezelo.kiirEredmenyek();
     }
 }
 

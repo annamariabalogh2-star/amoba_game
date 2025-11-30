@@ -1,11 +1,11 @@
 package hu.amoba.db;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.io.IOException;
 
 /** Ez az osztály az amőba játék adatbázis-kezeléséért felel.
  * A HighScoreRepository gondoskodik arról, hogy a játékosok győzelmeit (pontszámait) eltároljuk egy SQLite adatbázisban.
@@ -82,8 +82,7 @@ public class HighScoreRepository {
 
     /** Lekérdezi az összes játékos nevét és győzelmeinek számát.
      * Az eredmény egy rendezett lista (LinkedHashMap formában), amelyet a nyert meccsek száma szerint csökkenő
-     * sorrendben ad vissza. Az azonos pontszámú játékosok nevei abc rendben jelennek meg.
-     * @return Map, ahol a kulcs a játékos neve, az érték pedig a győzelmek száma. */
+     * sorrendben ad vissza. Az azonos pontszámú játékosok nevei abc rendben jelennek meg. */
     public Map<String, Integer> getAll() {
         Map<String, Integer> results = new LinkedHashMap<>();
         String sql = "SELECT player_name, wins FROM highscore ORDER BY wins DESC, player_name ASC";

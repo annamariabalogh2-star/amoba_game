@@ -1,4 +1,4 @@
-package hu.amoba.model.io;
+package hu.amoba.io;
 
 import hu.amoba.model.Board;
 import hu.amoba.io.BoardIO;
@@ -9,10 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Teszt a BoardIO XML mentés és betöltés funkciójára.
- * Ellenőrzi, hogy a tábla állapota mentés után pontosan visszatölthető.
- */
+/** Teszt a BoardIO XML mentés és betöltés funkciójára, ellenőrzi, hogy a tábla állapota mentés után pontosan visszatölthető. */
 class BoardIOXmlTest {
 
     @Test
@@ -88,8 +85,5 @@ class BoardIOXmlTest {
         try { Files.deleteIfExists(file); }
            catch (IOException ignored) {}
     }
-
-
-
 }
 

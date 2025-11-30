@@ -1,4 +1,4 @@
-package hu.amoba.model;
+package hu.amoba.ui;
 
 import hu.amoba.ui.Game;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package hu.amoba.model;
+package hu.amoba.ui;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

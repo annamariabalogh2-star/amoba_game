@@ -1,40 +1,30 @@
 package hu.amoba.model;
 
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-/**
- * Egységtesztek a Board osztályhoz.
- * Minden teszt egy-egy konkrét funkciót vizsgál:
+/** Egységtesztek a Board osztályhoz, minden teszt egy-egy konkrét funkciót vizsgál:
  * - üres tábla létrehozás
  * - jel lerakása
  * - szomszédos mező szabály
  * - győzelem ellenőrzés
  * - legális lépések
- *
- * Az @Test annotációval jelölt metódusokat automatikusan futtatja a JUnit.
- */
+ * Az @Test annotációval jelölt metódusokat automatikusan futtatja a JUnit. */
+
 public class BoardTest {
 
     private Board board;
 
-    /**
-     * Minden teszt előtt lefut, új, tiszta táblát hoz létre.
-     * Így a tesztek nem zavarják egymást.
-     */
+    /** Minden teszt előtt lefut, új, tiszta táblát hoz létre, így a tesztek nem zavarják egymást. */
     @BeforeEach
     void setup() {
         board = new Board(10, 10);
     }
 
-    /**
-     * Ellenőrzi, hogy az üres tábla helyesen jön-e létre:
-     * minden cella '-'
-     */
+    /** Ellenőrzi, hogy az üres tábla helyesen jön-e létre: minden cella '-' */
     @Test
     void testEmptyBoardCreation() {
         for (int r = 0; r < board.getRows(); r++) {
@@ -45,10 +35,7 @@ public class BoardTest {
         }
     }
 
-    /**
-     * Teszteli, hogy jel lerakása sikeres,
-     * és valóban bekerül a táblába.
-     */
+    /** Teszteli, hogy jel lerakása sikeres, és valóban bekerül a táblába. */
     @Test
     void testPlaceMarkSuccessfully() {
         boolean ok = board.place(0, 0, 'X');
@@ -56,9 +43,7 @@ public class BoardTest {
         assertEquals('X', board.getCells()[0][0], "A mezőn meg kell jelennie az X-nek");
     }
 
-    /**
-     * Teszt: nem lehet a táblán kívülre lépni.
-     */
+    /** Teszt: nem lehet a táblán kívülre lépni. */
     @Test
     void testCannotPlaceOutsideBoard() {
         boolean ok = board.place(10, 10, 'X'); // 0–9 indexek engedettek
