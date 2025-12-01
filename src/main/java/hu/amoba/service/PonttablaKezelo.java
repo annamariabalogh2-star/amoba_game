@@ -1,27 +1,31 @@
 package hu.amoba.service;
 
 import hu.amoba.db.HighScoreRepository;
-import java.util.Map;
 
-public class PonttablaKezelo {
+public class PonttablaKezelo {                           // Ponttábla kezelés, győzelem: 3 pont, döntetlen: 1 pont.
 
-    private final HighScoreRepository repo = new HighScoreRepository();
+    private HighScoreRepository repo;
 
-    /** Jatekos gyozott: kap 3 pontot. */
-    public void jatekosNyert(String jatekosNev) {
-        repo.addPoints(jatekosNev, 3);
+    public PonttablaKezelo() {                           // Konstruktor, amit a program használ
+        this.repo = new HighScoreRepository();
     }
 
-    /** Dontetlen: mindket jatekos kap 1-1 pontot. */
-    public void dontetlen(String jatekos1, String jatekos2) {
+    public PonttablaKezelo(HighScoreRepository repo) {   // Teszteléshez szükséges konstruktor
+        this.repo = repo;
+    }
+
+    public void jatekosNyert(String jatekosNev) {
+        repo.addPoints(jatekosNev, 3);
+    } // Ha a játékos győz 3 pontot kap.
+
+    public void dontetlen(String jatekos1, String jatekos2) {   // Döntetlen, mindkét játéko 1-1 pontot kap.
         repo.addPoints(jatekos1, 1);
         repo.addPoints(jatekos2, 1);
     }
 
-    /** Csak kiirjuk az aktualis ponttabelat. */
     public void kiirEredmenyek() {
         repo.printHighScores();
-    }
+    }    // Kiírjuk az aktuális pontállást.
 }
 
 
