@@ -9,22 +9,18 @@ import java.nio.charset.StandardCharsets;
  *  - a lépések feldolgozását,
  *  - a mentést és betöltést,
  *  - valamint a győzelem vagy döntetlen megállapítását.
-  * Itt tehát csak az indítás történik, maga a játék logika a Game.start() metódusban van megvalósítva.
-  * A kód elején a konzol kimenet (System.out) UTF-8 karakterkódolásra van állítva,
- * hogy a magyar ékezetes karakterek helyesen jelenjenek meg a terminálban. */
+ * Itt tehát csak az indítás történik, maga a játék logika a Game.start() metódusban van megvalósítva.
+ * A kód elején a konzol kimenet (System.out) UTF-8 karakterkódolásra van állítva,
+ * hogy a magyar ékezetes karakterek helyesen jelenjenek meg a terminálban.
+ */
 
-public class App {
+public class App {                           // Az alkalmazás belépési pontja (main osztály)
 
-    /** A program fő metódusa — innen indul el a játék.
-     * @param args parancssori argumentumok (nem használjuk) */
-
-    public static void main(String[] args) {
-
-        // Konzol kimenet átállítása UTF-8-ra – IntelliJ saját konzolja ezt tudja kezelni
+    public static void main(String[] args) { // A program indulási pontja (JVM ezt hívja meg)
+        // A standard kimenetet (System.out) UTF-8 kódolásra állítjuk, hogy a magyar ékezetes karakterek helyesen jelenjenek meg
         System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
 
-        // A játék indítása: új Game példány létrehozása és a start() metódus meghívása
-        new Game().start();
+        new Game().start();                  // Létrehoz egy Game objektumot, majd elindítja a játék teljes folyamatát
     }
 }
 

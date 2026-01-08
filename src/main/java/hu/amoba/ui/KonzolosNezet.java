@@ -3,52 +3,50 @@ package hu.amoba.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class KonzolosNezet {
+public class KonzolosNezet {                          // Konzolos „nézet”: csak kiírásokat kezel
 
-    private static final Logger log = LoggerFactory.getLogger(KonzolosNezet.class);
+    private static final Logger log = LoggerFactory.getLogger(KonzolosNezet.class); // Logger: kilépéskor naplóz egy információs üzenetet
 
-    private static final String BLUE = "\u001B[34m";
-    private static final String RESET = "\u001B[0m";
+    private static final String BLUE = "\u001B[34m";  // Kék szín ANSI kód (konzol színezéshez)
+    private static final String RESET = "\u001B[0m";  // Szín visszaállítása alapértelmezettre
 
-    /** A kezdő képernyő megjelenítése. */
-    public void showIntro() {
+    public void showIntro() {                         // Kezdő képernyő megjelenítése
         System.out.println(BLUE +
                 "==============================\n" +
                 "                              \n" +
-                "        AMOBA JATEK           \n" +
+                "        AMŐBA JÁTÉK           \n" +
                 "                              \n" +
-                "==============================\n" + RESET);
+                "==============================\n" + RESET); // ASCII-szerű keretes cím kiírása kék színnel
     }
 
-    /** Kilépéskor megjelenő üzenet. */
-    public void showGoodbye() {
+    public void showGoodbye() {                       // Kilépéskor megjelenő búcsú üzenet
+        System.out.println();
         System.out.println(BLUE +
                 "==============================\n" +
                 "                              \n" +
-                "          VISZLAT!            \n" +
+                "          VISZLÁT!            \n" +
                 "                              \n" +
                 "==============================\n" + RESET);
-        log.info("A jatek vege, koszi a meccset!");
+        log.info("A játék vége, köszi a meccset!");   // Naplózza, hogy a játék véget ért
     }
 
-    /** A parancslista és szabályok kiírása. */
-    public void showHelp() {
+    public void showHelp() {                          // Súgó és parancslista megjelenítése
         System.out.println("""
             Parancsok:
-              help                 - sugo
+              help                 - súgó
               lepes <sor> <oszlop> - pl. 'lepes 3 c'
-              ment                 - tabla mentese
-              betolt               - tabla betoltese
-              xmlment              - mentes XML-be
-              xmlbetolt            - betoltes XML-bol
+              ment                 - tábla mentése
+              betolt               - tábla betöltése
+              xmlment              - mentés XML-be
+              xmlbetolt            - betöltés XML-ből
               score                - high score lista
-              kilep                - kilepes
+              kilep                - kilépés
 
-            Szabalyok:
-              * X (ember) kezd AUTOMATIKUSAN kozepen vagy kezdolepes nelkul indul a jatek.
-              * Csak szomszedos ures mezore lehet lepni!
-              * Ha 5 azonos jel van egymas mellett, gyozelem!!!
-            """);
+            Szabályok:
+              * X (ember) kezd automatikusan közepen vagy kezdőlépés nélkül indul a játék.
+              * Csak szomszédos üres mezőre lehet lépni!
+              * Ha 5 azonos jel van egymás mellett, győzelem!!!
+            """);                                       // A felhasználó számára elérhető parancsok és játékszabályok kiírása
     }
 }
 

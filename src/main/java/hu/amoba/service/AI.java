@@ -1,31 +1,23 @@
 package hu.amoba.service;
 
-import hu.amoba.model.Board;
-
 import java.util.List;
 import java.util.Random;
 
+import hu.amoba.model.Board;
+
 /**
- * Egyszerű gépi játékos (AI).
- * A Board osztálytól elkéri az összes szabályos lépést,
+ * Egyszerű gépi játékos (AI). A Board osztálytól elkéri az összes szabályos lépést,
  * és ezek közül véletlenszerűen kiválaszt egyet.
  */
-public class AI {
+public class AI {                                   // Egyszerű gépi játékos
 
-    /** Véletlenszám-generátor a lehetséges lépések közül választáshoz. */
-    private final Random rnd = new Random();
+    private final Random rnd = new Random();        // Véletlenszám-generátor a lépések kiválasztásához
 
-    /**
-     * Kiválaszt egy véletlen érvényes lépést a táblán.
-     *
-     * @param board az aktuális játék tábla
-     * @return egy {sor, oszlop} tömb, vagy null, ha nincs több lépés
-     */
-    public int[] pickMove(Board board) {
-        List<int[]> legal = board.legalMoves();   // szabad, legális mezők
-        if (legal.isEmpty()) {
-            return null;                          // nincs több lépés → döntetlen
+    public int[] pickMove(Board board) {            // Kiválaszt egy lépést a táblán
+        List<int[]> legal = board.legalMoves();     // Elkéri a Board-tól az összes szabályos lépést (sor, oszlop párok)
+        if (legal.isEmpty()) {                      // Ha nincs egyetlen szabályos lépés sem
+            return null;                            // nincs több lépés, döntetlen
         }
-        return legal.get(rnd.nextInt(legal.size()));
+        return legal.get(rnd.nextInt(legal.size())); // Véletlenszerűen kiválaszt egyet a lehetséges lépések közül, és visszaadja
     }
 }

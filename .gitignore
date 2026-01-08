@@ -1,43 +1,72 @@
+#############################
+# Maven target / build dirs
+#############################
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!/src/main//target/
-!/src/test//target/
+build/
 
-### IntelliJ IDEA ###
+#############################
+# Maven Wrapper
+#############################
+!.mvn/wrapper/maven-wrapper.jar
+
+#############################
+# IntelliJ IDEA
+#############################
 .idea/
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
 *.iml
+*.iws
 *.ipr
 
-### Eclipse ###
-.apt_generated
+# IntelliJ misc
+out/
+workspace.xml
+modules.xml
+jarRepositories.xml
+compiler.xml
+libraries/
+
+#############################
+# Eclipse / NetBeans (ha valaki más nyitja meg)
+#############################
 .classpath
-.factorypath
 .project
-.settings
-.springBeans
-.sts4-cache
+.settings/
+.nb-gradle/
+nbproject/
+nbbuild/
+dist/
+nbdist/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!/src/main//build/
-!/src/test//build/
-
-### VS Code ###
+#############################
+# VS Code
+#############################
 .vscode/
 
-### Mac OS ###
+#############################
+# OS junk files
+#############################
 .DS_Store
-
-# Windows system files
-desktop.ini
 Thumbs.db
+desktop.ini
+
+#############################
+# LOG / TEMP / BACKUP files
+#############################
+*.log
+*.tmp
+*.bak
+
+#############################
+# Amőba projekt mentés-fájlok
+# (txt / xml, amit a Game ment/betölt)
+#############################
+board.txt
+board.xml
+tabla.txt
+test_board.xml
+game.log
+
+#############################
+# Don’t ignore source code build folders
+# (These exceptions are unnecessary — removed)
+#############################

@@ -1,8 +1,0 @@
-# Player: tesztjátékos
-<board rows="5" cols="5">
-<row>.....</row>
-<row>.....</row>
-<row>..XO.</row>
-<row>...X.</row>
-<row>.....</row>
-</board>

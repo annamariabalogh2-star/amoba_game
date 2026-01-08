@@ -3,22 +3,9 @@ package hu.amoba.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Ez az osztály egy nagyon egyszerű példa a naplózás (logolás) használatára a Logback könyvtár segítségével.
- * A naplózás célja, hogy a program futása közben fontos eseményeket rögzítsünk:
- *  - mikor indult el egy művelet,
- *  - milyen hibák, figyelmeztetések történtek,
- *  - vagy csak általános információkat (például: "A játék elindult").
- *
- * A Logback az SLF4J (Simple Logging Facade for Java) rendszert használja, ami egységes logolási felületet biztosít
- * különböző naplózó keretrendszerekhez.
- *
- * A naplóüzenetek különböző szinteken adhatók meg:
- *  - **info**  → általános információ (normál működés közbeni események)
- *  - **warn**  → figyelmeztetés (nem kritikus, de gyanús helyzet)
- *  - **error** → hibaüzenet (komoly probléma vagy kivétel)
- *
- * Ez az osztály nem része közvetlenül a játék logikájának, hanem bemutató célból készült, hogy lássuk,
- * hogyan működik a naplózás. */
+/**
+ * Példa a naplózás (logging) használatára Java-ban.
+ */
 
 public class LogExample {
 

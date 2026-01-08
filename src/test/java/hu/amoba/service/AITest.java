@@ -4,8 +4,10 @@ import hu.amoba.model.Board;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Egyszerű teszt az AI működésének ellenőrzésére. A cél, megbizonyosodunk róla, hogy az AI képes legalább egy érvényes lépést kiválasztani
- * egy olyan táblán, ahol van szabad mező. */
+/**
+ * Egyszerű teszt az AI működésének ellenőrzésére. A cél, megbizonyosodunk róla, hogy az AI képes legalább egy érvényes lépést kiválasztani
+ * egy olyan táblán, ahol van szabad mező.
+ */
 
 class AITest {
 
@@ -38,7 +40,6 @@ class AITest {
     @Test
     void testPickMoveWhenBoardFull() {
         // Teszt: ha a tábla tele van, az AI-nak null-t kell visszaadnia
-
         Board full = new Board(3, 3);
 
         // Telepakoljuk a táblát X és O jelekkel

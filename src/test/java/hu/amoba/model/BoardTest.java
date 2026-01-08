@@ -12,7 +12,8 @@ import java.util.List;
  * - szomszédos mező szabály
  * - győzelem ellenőrzés
  * - legális lépések
- * Az @Test annotációval jelölt metódusokat automatikusan futtatja a JUnit. */
+ * (Az @Test annotációval jelölt metódusokat automatikusan futtatja a JUnit.)
+ */
 
 public class BoardTest {
 
@@ -68,6 +69,20 @@ public class BoardTest {
         assertFalse(board.hasAnyMark(), "Kezdetben nincs jel");
         board.place(5, 5, 'X');
         assertTrue(board.hasAnyMark(), "Legalább egy jelnek lennie kell");
+    }
+
+    /**
+     * Teszt a középkezdéshez.
+     */
+    @Test
+    void testCenterPlacement() {
+        Board b = new Board(10, 10);
+
+        int r = b.getRows() / 2;
+        int c = b.getCols() / 2;
+
+        assertTrue(b.place(r, c, 'X'));
+        assertEquals('X', b.getCells()[r][c]);
     }
 
     /**
@@ -154,7 +169,6 @@ public class BoardTest {
         // Teljesen üres tábla esetén minden mező engedett (első lépés)
         List<int[]> legal1 = board.legalMoves();
         assertEquals(100, legal1.size(), "Üres tábla esetén 100 legális mező (10x10)");
-
         // Ha lerakunk egy jelet, csak a szomszédosak lesznek legálisak
         board.place(5, 5, 'X');
         List<int[]> legal2 = board.legalMoves();
@@ -170,10 +184,11 @@ public class BoardTest {
                 "A tábla kiíratása nem okozhat kivételt");
     }
 
+    /**
+     * Teszt: ne jelezzen győzelmet, ha nincs 5 egymás melletti azonos jel.
+     */
     @Test
     void testHasFiveInARowFalseCase() {
-        // Teszt: ne jelezzen győzelmet, ha nincs 5 egymás melletti azonos jel
-
         Board board = new Board(5, 5);
         board.place(0, 0, 'X');
         board.place(0, 1, 'X');

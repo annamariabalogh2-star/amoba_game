@@ -15,10 +15,9 @@ public class GameTest {
 
     private Game game;
 
-    /** Minden teszt előtt új játék indul. */
+    /** Minden teszt előtt lefut, és létrehoz egy új Game példányt. */
     @BeforeEach
     void setup() {
-        System.setProperty("test.env", "true"); // Tesztmód bekapcsolása
         game = new Game();
     }
 
@@ -26,19 +25,6 @@ public class GameTest {
     @Test
     void testGameInitialization() {
         assertNotNull(game.getBoard(), "A játék táblája nem lehet null induláskor.");
-    }
-
-    /** Az X kezdőlépése a tábla közepére kerül. */
-    @Test
-    void testFirstMoveIsCenter() {
-        game.start(); // itt automatikusan középre kerül az X
-
-        int r = game.getBoard().getRows() / 2;
-        int c = game.getBoard().getCols() / 2;
-        char[][] cells = game.getBoard().getCells();
-
-        assertEquals('X', cells[r][c],
-                "A kezdő lépésnek az X-nek kell lennie a tábla közepén.");
     }
 
     /** A gép (O) lépése után legalább egy 'O' legyen a táblán. */
@@ -70,13 +56,6 @@ public class GameTest {
     void testInvalidMoveRejected() {
         boolean ok = game.getBoard().place(-1, -1, 'X');
         assertFalse(ok, "Érvénytelen mezőre ne lehessen lépni.");
-    }
-
-    /** Teszt: a start() metódus lefut teszt módban (nem kér be inputot). */
-    @Test
-    void testStartMethodRunsInTestMode() {
-        assertDoesNotThrow(() -> game.start(),
-                "A start() metódusnak teszt módban hiba nélkül le kell futnia.");
     }
 
     /** Teszt: a computerMove() metódus nem dob hibát és módosít a táblán. */

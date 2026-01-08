@@ -3,317 +3,284 @@ package hu.amoba.ui;
 import java.nio.file.Path;
 import java.util.Scanner;
 
-import hu.amoba.service.AI;
-import hu.amoba.model.Board;
 import hu.amoba.io.BoardIO;
-import hu.amoba.vo.Player;
-import hu.amoba.service.PonttablaKezelo;
+import hu.amoba.model.Board;
+import hu.amoba.service.AI;
 import hu.amoba.service.DontetlenEllenorzo;
+import hu.amoba.service.PonttablaKezelo;
+import hu.amoba.vo.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Game {
+/**
+ * Az amőba játék fő vezérlő osztálya.
+ */
 
-    /** A játék táblája, amely tartalmazza az aktuális állást. */
-    private Board board;
+public class Game {                             // A teljes játékmenetet vezérli (konzol parancsokkal)
 
-    /** Naplózás (logolás) az SLF4J segítségével. */
-    private static final Logger log = LoggerFactory.getLogger(Game.class);
+    private Board board;                        // Az aktuális tábla állapot
 
-    /** Véletlenszerű lépéseket végző AI (mesterséges intelligencia). */
-    private final AI ai = new AI();
+    private static final Logger log = LoggerFactory.getLogger(Game.class); // Logger, eseményeket ír (info/warn), “naplózásra”
 
-    /** Konzolos adatbekéréshez szükséges Scanner. */
-    private Scanner sc = new Scanner(System.in);
+    private final AI ai = new AI();             // Gép játékos, véletlen szabályos lépést választ
 
-    /** Az emberi játékos objektuma. */
-    private Player human;
+    @SuppressWarnings("FieldCanBeLocal")
+    private Scanner sc = new Scanner(System.in); // Konzolos beolvasó (parancsokhoz)
 
-    /** A gépi játékos (O) objektuma, fix névvel. */
-    private final Player cpu = new Player("Gep", 'O');
+    @SuppressWarnings("FieldCanBeLocal")
+    private Player human;                       // Emberi játékos (név + 'X')
 
-    /** A tábla mentéséhez használt szöveges fájl. */
-    private final Path tablaTxtFajl = Path.of("board.txt");
+    private final Player cpu = new Player("Gep", 'O'); // Gépi játékos (fix név, 'O')
+    // A mentett tábla szöveges fájl helye (aktuális mappa + tabla.txt)
+    private final Path tablaTxtFajl = Path.of(System.getProperty("user.dir"), "tabla.txt");
+    // A mentett tábla XML fájl helye (aktuális mappa + tabla.xml)
+    private final Path tablaXmlFajl = Path.of(System.getProperty("user.dir"), "tabla.xml");
 
-    /** A tábla XML mentéséhez használt fájl. */
-    private final Path tablaXmlFajl = Path.of("board.xml");
+    private final KonzolosNezet nezet = new KonzolosNezet(); // “Képernyők”: intro, help, goodbye (külön osztályban)
 
-    /** Konzolos nézet (kezdőképernyő, súgó, búcsú). */
-    private final KonzolosNezet nezet = new KonzolosNezet();
+    private final PonttablaKezelo ponttablaKezelo = new PonttablaKezelo(); // Ponttábla kezelő, ami adatbázist használ
 
-    /** Ponttábla-kezelő (HighScoreRepository köré). */
-    private final PonttablaKezelo ponttablaKezelo = new PonttablaKezelo();
+    private final DontetlenEllenorzo dontetlenEllenorzo = new DontetlenEllenorzo(); // Döntetlen ellenőrzés
 
-    /** Döntetlen ellenőrzéséért felelős segéd. */
-    private final DontetlenEllenorzo dontetlenEllenorzo = new DontetlenEllenorzo();
-
-    /** Létrehoz egy alapértelmezett 10x10-es táblát. */
-    public Game() {
-        board = new Board(10, 10);
+    public Game() {                                     // Konstruktor: alap tábla létrehozása
+        board = new Board(10, 10);           // Kezdéskor 10x10-es üres tábla
     }
 
-    public void start() {
-        sc = new Scanner(System.in);
-        log.info("A jatek elindult.");
+    public void start() {                               // A játék elindítása (fő vezérlő metódus)
+        sc = new Scanner(System.in);                    // Scanner újra létrehozása (friss beolvasó)
+        log.info("A játék elindult.");                  // Log: játék indult
 
-        if (Boolean.getBoolean("test.env")) {
-            System.out.println("[Teszt mód] A Game.start() interaktív része kihagyva, középső X lerakva teszteléshez.");
-            if (!board.hasAnyMark()) {
-                int r = board.getRows() / 2;
-                int c = board.getCols() / 2;
-                board.place(r, c, 'X');
+        nezet.showIntro();                              // Kezdőképernyő kiírása
+
+        System.out.print("Kérlek add meg a neved: ");   // Játékosnév bekérése.
+        String name = sc.nextLine().trim();             // Beolvassa és levágja a szóközöket
+        if (name.isEmpty()) {                           // Ha nem adott meg nevet
+            name = "Gamer";                             // Alapnév
+            System.out.println("Név nem lett megadva, automatikusan beállitva: " + name); // Info
+        }
+        human = new Player(name, 'X');            // Emberi játékos létrehozása (X)
+
+        System.out.println("\n-- Amőba Játék --");      // Cím kiírás
+        nezet.showHelp();                               // Súgó kiirás
+
+        String answer;
+        do {                                            // Addig kérdez, amíg nem üres választ kap
+            System.out.print("Szeretnéd betölteni a korábbi mentést? (i/n): ");
+            answer = sc.nextLine().trim().toLowerCase(); // beolvas + kisbetű
+        } while (answer.isEmpty());
+
+            if (answer.equals("i")) {                     // Betöltés: korábbi játék állása fájlból
+                board = BoardIO.loadOrEmpty(tablaTxtFajl, 10, 10); // betöltés (ha hiba: 10x10 üres)
+
+                System.out.println("Korábbi játék betöltve.\n");
+                log.info("Korábbi játékállás betöltve a fájlbol.");
+        } else {                                          // Új játék: üres tábla + opcionális automatikus kezdőlépés
+            board = new Board(10, 10);         // új üres tábla
+            System.out.println("Új játék kezdődik!\n");
+            log.info("Új játék kezdődik üres táblával.");
+
+            System.out.print("Szeretnél automatikus kezdőlépést középre? (i/n): ");
+            String autoValasz = sc.nextLine().trim().toLowerCase(); // választ beolvassa
+
+            if (!autoValasz.equals("n")) {                 // Ha nem “n”, akkor kezdőlépést ad középre
+                int kozepSor = centerIndex(board.getRows()); // középső sor index
+                int kozepOszlop = centerIndex(board.getCols()); // középső oszlop index
+
+                board.place(kozepSor, kozepOszlop, 'X'); // X-et középre tesz
+
+                System.out.println("Automatikus kezdőlépés (X) középre: sor="
+                        + (kozepSor + 1) + ", oszlop=" + (char) ('a' + kozepOszlop)); // Info
+                log.info("Automatikus kezdőlépés történt középre.");
+
+                int[] aiMove = ai.pickMove(board);        // AI választ egy lépést
+
+                if (aiMove != null) {                     // Ha van lépés
+                    int sor = aiMove[0];                  // sor kiolvasása
+                    int oszlop = aiMove[1];               // oszlop kiolvasása
+
+                    board.place(sor, oszlop, 'O');  // O-t lerakja a gép
+
+                    System.out.println("Gép (O) lép: sor=" + (sor + 1)
+                            + ", oszlop=" + (char) ('a' + oszlop)); // kiírja a gép lépését
+                }
+            } else {
+                System.out.println("Automatikus kezdőlépés nélkül indul a játék. Te kezdesz a saját lépéseddel.");
+                log.info("A játékos kérésére nincs automatikus kezdőlépés."); // Info
             }
-            return;
         }
 
-        nezet.showIntro();                                          // Kezdőképernyő betöltése.
+        boolean kilepParancs = false;                    // Jelzi, hogy kilépett-e a játékos
 
-        System.out.print("Kerlek add meg a neved: ");               // Játékosnév bekérése.
-        String name = sc.nextLine().trim();
-        if (name.isEmpty()) {
-            name = "Gamer";
-            System.out.println("Nev nem lett megadva, automatikusan beallitva: " + name);
-        }
-        human = new Player(name, 'X');
+        while (true) {                                   // Fő játékkör (parancsfeldolgozás)
+            board.print();                               // Tábla kirajzolása
+            // Parancs kiírása
+            System.out.print("\nParancs (pl. 'lepes 3 c' | 'ment' | 'betolt' | 'xmlment' | 'xmlbetolt' | 'score' | 'kilep'): ");
+            String line = sc.nextLine().trim();          // Beolvassa a sort
 
-        System.out.println("\n-- Amoba Jatek --");
-        nezet.showHelp();
-
-        // Korábbi mentés betöltése, ha van.
-        System.out.print("Szeretned betolteni a korabbi mentest? (i/n): ");
-        String answer = sc.nextLine().trim().toLowerCase();
-
-        if (answer.equals("i")) {
-            board = BoardIO.loadOrEmpty(tablaTxtFajl, 10, 10);
-            System.out.println("Korabbi jatek betoltve.\n");
-            log.info("Korabbi jatekallas betoltve a fajlbol.");
-        } else {
-            board = new Board(10, 10);
-            System.out.println("Uj jatek kezdodik!\n");
-            log.info("Uj jatek kezdodik ures tablaval.");
-        }
-
-        // Eldöntjük, hogy legyen-e automatikus kezdőlépés.
-        System.out.print("Szeretnel automatikus kezdolepest kozepre? (i/n): ");
-        String autoValasz = sc.nextLine().trim().toLowerCase();
-
-        // Ha a játékos igent mond (vagy bármi mást, csak nem 'n'), akkor mehet az automatikus lépés.
-        if (!autoValasz.equals("n")) {
-            int kozepSor = centerIndex(board.getRows());
-            int kozepOszlop = centerIndex(board.getCols());
-
-            board.place(kozepSor, kozepOszlop, 'X');
-
-            System.out.println("Automatikus kezdolepes (X) a kozepre: sor="
-                    + (kozepSor + 1) + ", oszlop=" + (char) ('a' + kozepOszlop));
-            log.info("Automatikus kezdolepes tortent a kozepre.");
-        } else {
-            System.out.println("Automatikus kezdolepes nelkul indul a jatek. Te kezdesz a sajat lepeseddel.");
-            log.info("A jatekos keresere nincs automatikus kezdolepes.");
-        }
-
-        boolean kilepParancs = false;                  // Jelzi, hogy a jatekos a 'kilep' parancsot valasztotta-e.
-
-        // Fő játékkör.
-        while (true) {
-            board.print();
-
-            System.out.print("\nParancs (pl. 'lepes 3 c' | 'ment' | 'betolt' | 'score' | 'kilep'): ");
-            String line = sc.nextLine().trim();
-
-            // Kilépés
-            if (line.equalsIgnoreCase("kilep")) {
-                kilepParancs = true;                    // megjegyezzuk, hogy kilepni szeretne
-                nezet.showGoodbye();
-                break;                                  // kilep a jatekkorbol
+            if (line.equalsIgnoreCase("kilep")) { // Kilépés parancs
+                kilepParancs = true;                     // Jelzi, hogy kilépés történt
+                nezet.showGoodbye();                     // Búcsú képernyő
+                break;                                   // Kilép a while ciklusból
             }
 
-            // Súgó
-            if (line.equalsIgnoreCase("help")) {
-                nezet.showHelp();
+            if (line.equalsIgnoreCase("help")) { // Súgó parancs
+                nezet.showHelp();                        // Súgó kiirás
+                continue;                                // Következő kör
+            }
+
+            if (line.equalsIgnoreCase("ment")) { // Mentés parancs (txt)
+                BoardIO.save(board, tablaTxtFajl);       // Tábla mentés fájlba
+                System.out.println("Tábla elmentve: " + tablaTxtFajl.toAbsolutePath());
                 continue;
             }
 
-            // Mentés txt-be
-            if (line.equalsIgnoreCase("ment")) {
-                BoardIO.save(board, tablaTxtFajl);
-                System.out.println("Tabla elmentve: " + tablaTxtFajl.toAbsolutePath());
-                continue;
-            }
-
-            // Betöltés txt-ből
-            if (line.equalsIgnoreCase("betolt")) {
+            if (line.equalsIgnoreCase("betolt")) { // Betöltés parancs (txt)
+                // Betölti és ha nincs fájl/hiba, akkor a jelenlegi méretű üres táblát ad
                 board = BoardIO.loadOrEmpty(tablaTxtFajl, board.getRows(), board.getCols());
-                System.out.println("Tabla betoltve (vagy ures, ha nem volt fajl)." + tablaTxtFajl.toAbsolutePath());
+                System.out.println("Tábla betöltve (vagy üres, ha nem volt fájl)." + tablaTxtFajl.toAbsolutePath());
                 continue;
             }
 
-            // Mentés XML-be
-            if (line.equalsIgnoreCase("xmlment")) {
-                BoardIO.saveToXml(board, tablaXmlFajl, human.getName());
-                System.out.println("Tabla elmentve XML formatumban: " + tablaXmlFajl.toAbsolutePath());
+            if (line.equalsIgnoreCase("xmlment")) { // Mentés XML-be
+                BoardIO.saveToXml(board, tablaXmlFajl, human.getName()); // Mentés XML-be + név kommentként
+                System.out.println("Tábla elmentve XML formátumban: {}" + tablaXmlFajl.toAbsolutePath());
                 continue;
             }
 
-            // Betöltés XML-ből
-            if (line.equalsIgnoreCase("xmlbetolt")) {
-                board = BoardIO.loadFromXml(tablaXmlFajl);
-                System.out.println("Tabla betoltve XML formatumbol: " + tablaXmlFajl.toAbsolutePath());
+            if (line.equalsIgnoreCase("xmlbetolt")) { // Betöltés XML-ből
+                board = BoardIO.loadFromXml(tablaXmlFajl); // Betöltés XML-ből (hiba esetén 10x10)
+                System.out.println("Tábla betöltve XML formátumból: {}" + tablaXmlFajl.toAbsolutePath());
                 continue;
             }
 
-            // High Score megjelenítés
-            if (line.equalsIgnoreCase("score")) {
-                ponttablaKezelo.kiirEredmenyek();
+            if (line.equalsIgnoreCase("score")) { // Ponttábla kiirás parancs
+                ponttablaKezelo.kiirEredmenyek(); // Eredmények kiírása
                 continue;
             }
 
-            // Lépés feldolgozása
-            if (line.toLowerCase().startsWith("lepes")) {
-                String[] parts = line.split("\\s+");
-                if (parts.length != 3) {
-                    System.out.println("Hasznalat: lepes <sor> <oszlopBetu>  pl. 'lepes 3 c'");
+            if (line.toLowerCase().startsWith("lepes")) {  // Lépés parancs felismerése
+                String[] parts = line.split("\\s+"); // Szétszedi a parancsot részekre
+                if (parts.length != 3) {                   // Ha nem 3 rész (lepes, sor, oszlop)
+                    System.out.println("Használat: lepes <sor> <oszlopBetu>  pl. 'lepes 3 c'"); // Hibajelzés
                     continue;
                 }
 
-                Integer r = parseRow(parts[1]);
-                Integer c = parseCol(parts[2]);
-                if (r == null || c == null) {
-                    System.out.println("Ervenytelen sor/oszlop!");
+                Integer r = parseRow(parts[1]);           // Sor átalakítás (1-index -> 0-index)
+                Integer c = parseCol(parts[2]);           // Oszlop betű -> index (a -> 0)
+                if (r == null || c == null) {             // Hibás input esetén
+                    System.out.println("Érvénytelen sor/oszlop!"); // Info
                     continue;
                 }
 
-                // Ember lépése
-                if (!board.place(r, c, human.getMark())) {
-                    System.out.println("Ervenytelen lepes, figyelj oda! Mit ittal? :) (foglaltsag / nem szomszedos)!");
-                    log.warn("Ervenytelen lepes: sor = {}, oszlop = {}", r, c);
+                if (!board.place(r, c, human.getMark())) { // Ember lépése (ellenőrzi, hogy szabályos-e?)
+                    System.out.println("Érvénytelen lépés, figyelj oda! (foglaltság / nem szomszédos)!"); // Info
+                    log.warn("Érvénytelen lépés: sor = {}, oszlop = {}", r, c); // Log warning
                     continue;
                 }
 
-                // Győzelem ellenőrzése
-                if (board.hasFiveInARow(human.getMark())) {
+                if (board.hasFiveInARow(human.getMark())) { // Ember nyert-e?
+                    board.print();                          // Tábla kiírás
+                    System.out.println(" Gratulálok! " + human.getName() + " (X) nyertél! Szép játék!!!"); // Győzelem üzenet
+                    ponttablaKezelo.jatekosNyert(human.getName()); // 3 pont a győztesnek
+                    ponttablaKezelo.kiirEredmenyek();       // Ponttábla kiírás
+                    log.info("{} Játékos (X) nyert!", human.getName());
+                    break;                                  // Kilép a játékkörből
+                }
+
+                int[] move = ai.pickMove(board);            // Gép választ lépést
+                if (move == null) {                         // Ha nincs lépés (nincs legális)
                     board.print();
-                    System.out.println(" Gratulalok! " + human.getName() + " (X) nyertel! Szep jatek!!!");
-                    ponttablaKezelo.jatekosNyert(human.getName());
+                    System.out.println("Nincs több lépés. Döntetlen! Micsoda játszma!");
+                    break;                                  // Kilép (vége)
+                }
+
+                board.place(move[0], move[1], cpu.getMark()); // Gép lerakja az O-t
+                System.out.println("Gep (O) lep: sor=" + (move[0] + 1) + ", oszlop=" + toCol(move[1])); // Kiírja a gép lépését
+
+                if (board.hasFiveInARow(cpu.getMark())) {    // Gép nyert-e?
+                    board.print();
+                    System.out.println(" Gép (O) nyert!");
+                    ponttablaKezelo.jatekosNyert(cpu.getName()); // 3 pont a gépnek
                     ponttablaKezelo.kiirEredmenyek();
-                    log.info("{} jatekos (X) nyert!", human.getName());
-                    break;
-                }
-
-                // Gép lépése
-                int[] move = ai.pickMove(board);
-                if (move == null) {
-                    board.print();
-                    System.out.println("Nincs tobb lepes. Dontetlen! Micsoda jatszma!");
-                    break;
-                }
-
-                board.place(move[0], move[1], cpu.getMark());
-                System.out.println("Gep (O) lep: sor=" + (move[0] + 1) + ", oszlop=" + toCol(move[1]));
-
-                // Gép győzelem
-                if (board.hasFiveInARow(cpu.getMark())) {
-                    board.print();
-                    System.out.println(" Gep (O) nyert!");
-                    ponttablaKezelo.jatekosNyert(cpu.getName());
-                    ponttablaKezelo.kiirEredmenyek();
-                    log.info("A gep (O) nyert!");
-                    break;
+                    log.info("A gép (O) nyert!");
+                    break;                                   // Kilép (vége)
                 }
                 continue;
             }
 
-            // Ha semmi sem egyezett:
-            System.out.println("Ismeretlen parancs. Ird be: help");
+            System.out.println("Ismeretlen parancs. Ird be: help"); // Ismeretlen parancs kezelése
         }
 
-        // Ha a játékos a 'kilep' parancsot irta be, akkor már ki lépünk, nincs értelme új játékot kérni, egyszerűen visszatérünk.
-        if (kilepParancs) {
-            return;
+        if (kilepParancs) {                                  // Ha kilépést választott
+            return;                                          // Kilép
         }
 
-        // Döntetlen ellenorzése.
-        if (dontetlenEllenorzo.isDraw(board)) {
-            System.out.println("A jatek dontetlennel ert veget!");
-            log.info("A jatek dontetlennel zarult.");
+        if (dontetlenEllenorzo.isDraw(board)) {              // Döntetlen ellenőrzése a játékkör után
+            System.out.println("A játék döntetlennel ért véget!");
+            log.info("A játék döntetlennel zárult.");
 
-            // dontetlen: mindketten kapnak 1-1 pontot
-            ponttablaKezelo.dontetlen(human.getName(), cpu.getName());
-            ponttablaKezelo.kiirEredmenyek();
+            ponttablaKezelo.dontetlen(human.getName(), cpu.getName()); // 1-1 pont mindkettőnek
+            ponttablaKezelo.kiirEredmenyek();                // Ponttábla kiírás
         }
 
-        // Egyszerű fő menü, kérdezze meg, akar-e új játékot.
-        System.out.print("Szeretnel uj jatekot kezdeni? (i/n): ");
-        String uj = sc.nextLine().trim().toLowerCase();
+        System.out.print("Szeretnél új játékot kezdeni? (i/n): "); // Új játék kérdés
+        String uj = sc.nextLine().trim().toLowerCase();      // Válasz beolvasás
 
         if ("i".equals(uj)) {
-            // Új, üres tábla – ugyanabban a futásban új meccs indul
-            board = new Board(10, 10);
-            log.info("Uj jatek indul ugyanabban a futasban.");
-            start();   // rekurzivan ujrainditjuk a jatekot
-        } else {
-            nezet.showGoodbye();
+            nezet.showGoodbye();                            // búcsú üzenet
         }
 
     }
 
-    /** Segédfüggvény: kiszámítja a középső indexet (páros/páratlan tábla esetén is). */
-    private int centerIndex(int n) {
-        return (n % 2 == 0) ? (n / 2 - 1) : (n / 2);
+    private int centerIndex(int n) {                        // Kiszámolja a középső indexet
+        return (n % 2 == 0) ? (n / 2 - 1) : (n / 2);        // Párosnál bal-közép, páratlannál közép
     }
 
-    /** Átalakítja a felhasználó által beírt sort (1-index) 0-indexre. */
-    private Integer parseRow(String s) {
+    private Integer parseRow(String s) {                    // "3" -> 2 (1-index -> 0-index)
         try {
-            int r = Integer.parseInt(s);
-            if (r < 1 || r > board.getRows()) return null;
-            return r - 1;
-        } catch (NumberFormatException e) {
+            int r = Integer.parseInt(s);                    // Számmá alakítja
+            if (r < 1 || r > board.getRows()) {             // Tartomány ellenőrzés
+                return null;                                // Hibás sor
+            }
+            return r - 1;                                   // 0-indexre váltás
+        } catch (NumberFormatException e) {                 // Ha nem szám
+            return null;                                    // Hibás input
+        }
+    }
+
+    private Integer parseCol(String s) {                    // "c" -> 2 (betű -> index)
+        if (s.length() != 1) {                              // Csak 1 karakter lehet
             return null;
         }
+        char ch = Character.toLowerCase(s.charAt(0));       // Kisbetűsít
+        int c = ch - 'a';                                   // 'a'->0, 'b'->1, ...
+        if (c < 0 || c >= board.getCols()) {                // Tartomány ellenőrzés
+            return null;
+        }
+        return c;                                           // Visszaadja az indexet
     }
 
-    /** Átalakítja az oszlopbetűt (a, b, c, ...) számmá. */
-    private Integer parseCol(String s) {
-        if (s.length() != 1) return null;
-        char ch = Character.toLowerCase(s.charAt(0));
-        int c = ch - 'a';
-        if (c < 0 || c >= board.getCols()) return null;
-        return c;
+    private String toCol(int c) {                           // 2 -> "c" (index -> betű)
+        return String.valueOf((char) ('a' + c));            // 'a'+c karakterből string
     }
 
-    /** Számindexből visszaalakítja az oszlop betűjelét (0 → a, 1 → b, stb.). */
-    private String toCol(int c) {
-        return String.valueOf((char) ('a' + c));
-    }
-
-    /** A tábla lekérése (teszteléshez). */
-    public Board getBoard() {
+    public Board getBoard() {                               // Getter: teszteknek a táblát visszaadja
         return board;
     }
 
-    /** A gép lépése – véletlenszerűen kiválasztott érvényes lépés. */
-    public void computerMove() {
-        int[] move = ai.pickMove(board);
-        if (move != null) {
-            board.place(move[0], move[1], 'O');
+    public void computerMove() {                            // Tesztekhez: a gép csinál egy lépést
+        int[] move = ai.pickMove(board);                    // AI választ lépést
+        if (move != null) {                                 // Ha van lépés
+            board.place(move[0], move[1], 'O');       // Lerak egy O-t
         }
     }
 
-    // Egyszerű "továbbhívó" metódusok a tesztek kedvéért.
-    /** Kezdő képernyő megjelenítése Game-ből. */
-    public void showIntro() {
-        nezet.showIntro();
+    public void showHelp() {                                // Game-ből hívható súgó
+        nezet.showHelp();                                   // Nézet kiírja a helpet
     }
 
-    /** Súgó megjelenítése Game-ből. */
-    public void showHelp() {
-        nezet.showHelp();
-    }
-
-    /** Ponttábla kiíratása Game-ből. */
-    public void printScores() {
-        ponttablaKezelo.kiirEredmenyek();
+    public void printScores() {                             // Game-ből hívható ponttábla
+        ponttablaKezelo.kiirEredmenyek();                   // Ponttábla kiírása
     }
 }
 
